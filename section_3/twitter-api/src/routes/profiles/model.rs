@@ -91,9 +91,14 @@ impl ProfileCreateMultipart {
                     main_url = Self::read_string(&mut field).await;                    
                 }
                 "avatar" => {
+                    // Create a vector of bytes.
                     let mut field_avatar = vec![];
+
+                    // Iterate through the bytes of the data with `.next()`
                     while let Some(chunk) = field.next().await {
                         let chunk = chunk.unwrap();
+
+                        // Append the chunks (Bytes) to the field_avatar vector.
                         field_avatar.extend_from_slice(&chunk);
                     }
                     avatar = Some(field_avatar);
