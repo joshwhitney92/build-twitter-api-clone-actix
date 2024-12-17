@@ -66,6 +66,11 @@ impl ProfileCreateMultipart {
             }
 
             let mut field = field_result.unwrap();
+
+            // `Content Disposition` is an HTTP protocol header that descibes \
+            // what type of data is in this field.
+            //
+            // Ref: https://datatracker.ietf.org/doc/html/rfc7578#section-4.2
             let content_disposition = field.content_disposition();
             let field_name = content_disposition.get_name().unwrap();
 
