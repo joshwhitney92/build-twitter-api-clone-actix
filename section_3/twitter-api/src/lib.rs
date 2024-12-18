@@ -50,6 +50,8 @@ use crate::routes::messages::message_route::{ create_message };
 pub async fn run() -> std::io::Result<()> {
     dotenv().ok();
     let port = env::var("PORT").unwrap().parse().unwrap();
+    // NOTE: This is the ip where we will install the app server, 
+    //       use localhost for now.
     let host = env::var("HOST").unwrap();
     let db_repo = DbRepo::init().await;
     let app_data = web::Data::new(AppState {
