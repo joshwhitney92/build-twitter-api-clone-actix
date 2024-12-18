@@ -51,6 +51,7 @@
             # sqlite
             openssl
             pkg-config
+            postgresql
             # tailwindcss
 
             # {{{ Add these as needed
