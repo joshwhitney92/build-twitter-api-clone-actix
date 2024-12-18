@@ -1,6 +1,7 @@
 /.direnv
 *swp
 *swo
+*vim
 target
 dbdata
 .ds_store
