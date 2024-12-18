@@ -9,6 +9,9 @@ use chrono::{ DateTime, Utc };
 //    members can exist
 // 2. we create repeatable structure to our code
 // 3. we can hide some members even from our parent module
+// NOTE: Most of these methods in `private_members` are `pub`.
+// NOTE: This means the parent module can access them, 
+//       even though the module itself is not `pub`
 mod private_members {
     use crate::common::entities::messages::model::MessageWithProfileQueryResult;
     use super::*;
@@ -256,6 +259,11 @@ mod private_members {
         }
     }
 
+    // NOTE: This module is not public!
+    // NOTE: That means the parent module will not have acceess to this function!
+    // NOTE: We do this because this module has nothing to do with \
+    //       anything outside of the current module - it is simply \
+    //       a helper function.
     async fn get_broadcasting_message_of_message(
         conn: &Pool<Postgres>,
         message: &MessageWithProfileQueryResult
@@ -282,6 +290,12 @@ mod private_members {
         }
     }
 
+
+    // NOTE: This module is not public!
+    // NOTE: That means the parent module will not have acceess to this function!
+    // NOTE: We do this because this module has nothing to do with \
+    //       anything outside of the current module - it is simply \
+    //       a helper function.
     fn append_broadcast_msgs_to_msgs(
         optional_broadcast_messages: &Option<Vec<MessageWithProfileQueryResult>>,
         following_messages_with_broadcasts: Vec<MessageWithProfileQueryResult>
