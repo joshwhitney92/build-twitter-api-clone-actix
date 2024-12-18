@@ -3,10 +3,13 @@
   description = "A flake for rust development.";
 
   # Flake inputs
-  inputs.nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/*.tar.gz";
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
+  };
 
   # Flake outputs
-  outputs = { self, nixpkgs }:
+  outputs = { self, nixpkgs, flake-utils }:
     let
       # The systems supported for this flake
       supportedSystems = [
