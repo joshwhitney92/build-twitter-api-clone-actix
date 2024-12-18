@@ -107,6 +107,7 @@ impl ProfileCreateMultipart {
             }
         }
 
+        // Perform validation on the profile, make sure required fields are populated.
         if user_name.is_some() && full_name.is_some() && description.is_some() {
             Ok(Self {
                 user_name: user_name.unwrap(),
