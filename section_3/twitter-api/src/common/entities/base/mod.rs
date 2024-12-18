@@ -10,6 +10,8 @@ pub struct EntityId {
     pub id: i64
 }
 
+/// Returns the database connection via `get_conn` function.
+/// Promotes loose coupling.
 pub trait DbConnGetter {
     type Output;
     fn get_conn(&self) -> &Self::Output;
@@ -17,10 +19,13 @@ pub trait DbConnGetter {
 
 #[derive(Clone)]
 pub struct DbRepo {
+    // NOTE: Encapsulate the connection pool by making it private.
     conn: Pool<Postgres>
 }
 
 impl DbRepo {
+    // NOTE: Don't call the constructor `new` here,
+    // becuase we are dealing with an async function.
     pub async fn init() -> Self {
         Self { conn: get_db_conn().await }
     }
@@ -47,6 +52,8 @@ pub async fn get_db_conn() -> Pool<Postgres> {
     );
 
     let conn = sqlx::postgres::PgPool::connect(&postgres_url).await.unwrap();
+
+    // NOTE: Migrations will not be re-run if they have aready ran!
     let migrate = migrate!("./migrations").run(&conn).await;
     match migrate {
         Ok(()) => println!("sqlx migration success"),

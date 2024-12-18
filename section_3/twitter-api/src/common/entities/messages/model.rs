@@ -33,6 +33,8 @@ pub struct MessageWithProfileQueryResult {
     pub broadcast_msg_id: Option<i64>    
 }
 
+// NOTE: This is an aggregation of multiple types. Note each
+// comment seciton below.
 #[derive(Deserialize, Serialize, FromRow, Clone, Debug)]
 pub struct MessageWithFollowingAndBroadcastQueryResult {
     // messsage fields

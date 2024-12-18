@@ -1,3 +1,4 @@
+-- A user profile table.
 create table profile (
     "id" bigserial primary key,
     "created_at" timestamptz(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -10,6 +11,7 @@ create table profile (
     "avatar" bytea
 );
 
+-- A linking table for users following other users.
 create table follow (
     "id" bigserial primary key,
     "created_at" timestamptz(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -21,6 +23,7 @@ create table follow (
     constraint fk_profile_following foreign key(following_id) references profile(id)
 );
 
+-- Main table for all messages posted.
 create table message (
     "id" bigserial primary key,
     "created_at" timestamptz(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -34,6 +37,7 @@ create table message (
     constraint fk_profile foreign key(user_id) references profile(id)
 );
 
+-- Linking table to link message respones to original message.
 create table message_response (
     "id" bigserial primary key,
     "created_at" timestamptz(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -45,6 +49,9 @@ create table message_response (
     constraint fk_responding_message foreign key(responding_msg_id) references message(id)
 );
 
+-- A Linking table for retweets.
+-- A "Re-Tweet" is a message that has been \
+-- "re-broadcast by another user.
 create table message_broadcast (
     "id" bigserial primary key,
     "created_at" timestamptz(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,

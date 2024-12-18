@@ -5,6 +5,8 @@ use sqlx::{ Pool, Postgres };
 use mockall::automock;
 use mockall::predicate::*;
 
+// NOTE: Encapsulate the concrete implementation in a private module.
+// This allows us to mock it later for our tests.
 mod private_members {
     use super::*;
 
@@ -38,6 +40,7 @@ mod private_members {
         }
     }
 
+    /// Update a profile that already exists.
     pub async fn update_profile_avatar_inner(
         conn: &Pool<Postgres>,
         user_id: i64,
@@ -95,6 +98,13 @@ mod private_members {
     }
 }
 
+/* Trait Implementations Below */
+// NOTE: We have a sepparate trait implementation for each database function.
+// NOTE: This allows us to mock out each implementation for our unit tests.
+
+
+// NOTE: Automock is a crate which handles the boiler plate of mocking.
+// NOTE: Async_trait is required for async functions in a trait.
 #[automock]
 #[async_trait]
 pub trait InsertProfileFn {

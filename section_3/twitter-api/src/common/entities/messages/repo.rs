@@ -5,7 +5,8 @@ use super::model::MessageWithFollowingAndBroadcastQueryResult;
 use async_trait::async_trait;
 use chrono::{ DateTime, Utc };
 
-// 1. we create a single logical container where multiple related members can exist
+// 1. we create a single logical container where multiple related 
+//    members can exist
 // 2. we create repeatable structure to our code
 // 3. we can hide some members even from our parent module
 mod private_members {
@@ -37,6 +38,9 @@ mod private_members {
                 Err(e)
             }
         };
+
+        // NOTE: If a funciton scope ends without an explicit commit
+        // it will rollback the transaction anyway.
         if message_id_result.is_err() {
             return message_id_result;
         }
@@ -50,6 +54,10 @@ mod private_members {
                 .bind(bm_id)
                 .fetch_one(&mut tx).await;
 
+            // NOTE: If we fail this time, rollback.
+            // It does not make sense to have a retweet \
+            // that does not have an association to the message \ 
+            // being retweeted.
             if message_broadcast_result.is_err() {
                 _ = tx.rollback().await;
                 return Err(message_broadcast_result.err().unwrap());
@@ -70,6 +78,7 @@ mod private_members {
     ) -> Result<i64, sqlx::Error> {
         let mut tx = conn.begin().await.unwrap();
 
+        // 1. First insert the response message as a new message.
         let insert_result = sqlx
             ::query_as::<_, EntityId>(
                 "insert into message (user_id, body, msg_group_type) values ($1, $2, $3) returning id"
@@ -85,11 +94,18 @@ mod private_members {
                 Err(e)
             }
         };
+
+        // NOTE: If a funciton scope ends without an explicit commit
+        // it will rollback the transaction anyway.
         if msg_id_result.is_err() {
             return msg_id_result;
         }
+
+        // 2. Get back the message id of the response message.
         let msg_id: i64 = msg_id_result.unwrap();
 
+        // 3. Insert the linking record to link the original_msg_id to \
+        // the responding_msg_id that was just inserted.
         let insert_msg_response_result = sqlx
             ::query_as::<_, EntityId>(
                 "insert into message_response (original_msg_id, responding_msg_id) values ($1, $2) returning id"
@@ -98,17 +114,26 @@ mod private_members {
             .bind(msg_id)
             .fetch_one(&mut tx).await;
 
+        // 4. Check if the linking record was inserted successfully.
         let msg_response_id_result = match insert_msg_response_result {
             Ok(row) => Ok(row.id),
             Err(e) => Err(e),
         };
+
+        // 5. If the linking record was not inserted successfully, 
+        // we need to rollback the transaction.
+        // NOTE: Need a rollback here becuase we have already done
+        // a successful insert above.
         if msg_response_id_result.is_err() {
             _ = tx.rollback().await;
             return msg_response_id_result;
         }
 
+        // 6. Make sure to commit the transaction if \
+        // we encountered no errors.
         _ = tx.commit().await;
 
+        // 7. Return the message id of the response message.
         Ok(msg_id)
     }
 
